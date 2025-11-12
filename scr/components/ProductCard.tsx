@@ -27,9 +27,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   const discount = product.originalPrice
-    ? Math.round(
-        ((product.originalPrice - product.price) / product.originalPrice) * 100
-      )
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
   return (
@@ -44,7 +42,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
           className="w-full h-full object-cover"
         />
 
-        {/* 11.11 Deal Badge */}
         {discount > 0 && (
           <div className="absolute top-3 left-3 z-10">
             <Badge className="bg-red-600 text-white px-3 py-1.5 text-xs font-bold animate-glow flex items-center gap-1 border-0">
@@ -54,21 +51,18 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </div>
         )}
 
-        {/* Discount Badge */}
         {discount > 0 && (
           <div className="absolute top-3 right-3 bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg">
             -{discount}% OFF
           </div>
         )}
 
-        {/* New Badge */}
         {product.isNew && !discount && (
           <div className="absolute top-3 left-3 bg-accent text-accent-foreground px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm">
             NEW
           </div>
         )}
 
-        {/* Best Seller Badge */}
         {product.isBestSeller && (
           <div className="absolute top-12 right-3 bg-primary text-primary-foreground px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm">
             BEST SELLER
@@ -97,7 +91,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
           )}
         </div>
 
-        {/* Buttons below description & price */}
         <div className="flex gap-3 mt-2">
           <Button
             size="icon"
