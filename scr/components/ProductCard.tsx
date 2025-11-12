@@ -1,10 +1,11 @@
-import { Heart, ShoppingCart } from "lucide-react";
-import { Product } from "@/data/products";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { ShoppingBag, Sparkles } from "lucide-react";
+import { Button } from "./ui/button";
+import { Card } from "./ui/card";
 import { useCart } from "@/context/CartContext";
-import { useToast } from "@/hooks/use-toast";
+import { Product } from "@/data/products";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { Badge } from "./ui/badge";
 
 interface ProductCardProps {
   product: Product;
@@ -12,15 +13,16 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const { addToCart } = useCart();
-  const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
     addToCart(product);
-    toast({
-      title: "Added to cart",
-      description: `${product.name} has been added to your cart.`,
-    });
+    toast.success(`${product.name} added to cart`);
+  };
+
+  const handleClick = () => {
+    navigate(`/product/${product.id}`);
   };
 
   const discount = product.originalPrice
@@ -28,64 +30,80 @@ const ProductCard = ({ product }: ProductCardProps) => {
     : 0;
 
   return (
-    <div 
-      className="group relative bg-card border rounded-lg overflow-hidden shadow-sm hover:shadow-elegant transition-all duration-300 cursor-pointer"
-      onClick={() => navigate(`/product/${product.id}`)}
+    <Card
+      className="group overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-lg card-hover-lift bg-card rounded-xl border border-border"
+      onClick={handleClick}
     >
-      {/* Badges */}
-      <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
-        {product.isNew && (
-          <Badge className="bg-primary text-primary-foreground">NEW</Badge>
-        )}
-        {discount > 0 && (
-          <Badge variant="destructive">-{discount}%</Badge>
-        )}
-      </div>
-
-      {/* Wishlist Icon */}
-      <button className="absolute top-3 right-3 z-10 p-2 bg-background/80 backdrop-blur-sm rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-background">
-        <Heart className="w-4 h-4 text-foreground" />
-      </button>
-
-      {/* Product Image */}
-      <div className="relative aspect-[3/4] bg-muted overflow-hidden">
+      <div className="relative overflow-hidden aspect-square bg-secondary product-image-zoom">
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          className="w-full h-full object-cover"
         />
+        
+        {/* 11.11 Deal Badge - Shows on discounted items */}
+        {discount > 0 && (
+          <div className="absolute top-3 left-3 z-10">
+            <Badge className="bg-red-600 text-white px-3 py-1.5 text-xs font-bold animate-glow flex items-center gap-1 border-0">
+              <Sparkles className="w-3 h-3" />
+              11.11 DEAL
+            </Badge>
+          </div>
+        )}
+        
+        {/* Discount Badge */}
+        {discount > 0 && (
+          <div className="absolute top-3 right-3 bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg">
+            -{discount}% OFF
+          </div>
+        )}
+        
+        {/* New Badge */}
+        {product.isNew && !discount && (
+          <div className="absolute top-3 left-3 bg-accent text-accent-foreground px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm">
+            NEW
+          </div>
+        )}
+        
+        {/* Best Seller Badge */}
+        {product.isBestSeller && (
+          <div className="absolute top-12 right-3 bg-primary text-primary-foreground px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm">
+            BEST SELLER
+          </div>
+        )}
       </div>
 
-      {/* Product Info */}
-      <div className="p-4">
-        <h3 className="font-medium text-sm mb-2 line-clamp-2 text-foreground">
-          {product.name}
-        </h3>
-        
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-lg font-bold text-foreground">
-            Rs. {product.price.toLocaleString()}
-          </span>
-          {product.originalPrice && (
-            <span className="text-sm text-muted-foreground line-through">
-              Rs. {product.originalPrice.toLocaleString()}
-            </span>
-          )}
+      <div className="p-5 space-y-3">
+        <div>
+          <h3 className="font-bold text-base mb-1 line-clamp-2 group-hover:text-accent transition-colors">
+            {product.name}
+          </h3>
+          <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">
+            {product.category}
+          </p>
         </div>
 
-        <Button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleAddToCart();
-          }}
-          className="w-full"
-          size="sm"
-        >
-          <ShoppingCart className="w-4 h-4 mr-2" />
-          Add to Cart
-        </Button>
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <p className="text-2xl font-bold">
+              Rs. {product.price.toLocaleString()}
+            </p>
+            {product.originalPrice && (
+              <p className="text-sm text-muted-foreground line-through">
+                Rs. {product.originalPrice.toLocaleString()}
+              </p>
+            )}
+          </div>
+          <Button
+            size="icon"
+            onClick={handleAddToCart}
+            className="rounded-full h-11 w-11 bg-accent text-accent-foreground hover:bg-accent/90 shadow-soft hover:shadow-medium transition-all duration-300"
+          >
+            <ShoppingBag className="h-5 w-5" />
+          </Button>
+        </div>
       </div>
-    </div>
+    </Card>
   );
 };
 
